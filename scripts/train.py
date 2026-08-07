@@ -83,7 +83,12 @@ def main(cfg: DictConfig):
     model = MultiTaskRestorationNet(
         in_channels=cfg.model.in_channels,
         out_channels=cfg.model.out_channels,
-        base_filters=cfg.model.base_filters
+        encoder_channels=cfg.model.encoder_channels,
+        num_residual_blocks=cfg.model.num_residual_blocks,
+        attention_type=cfg.model.attention_type,
+        num_tasks=cfg.model.num_tasks,
+        task_names=cfg.model.task_names,
+        use_defect_preservation=cfg.model.use_defect_preservation
     )
     
     criterion = CombinedLoss(
