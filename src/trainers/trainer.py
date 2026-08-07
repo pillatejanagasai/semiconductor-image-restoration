@@ -38,10 +38,10 @@ class Trainer:
         self.config = config
         self.device = device
         
-        self.scaler = GradScaler() if config.get('use_amp', True) else None
+        self.scaler = torch.amp.GradScaler('cuda') if config.get('use_amp', True) and torch.cuda.is_available() else None
         
         if config.get('scheduler'):
-            scheduler_cfg = config.get('scheduler', {})
+            scheduler_cfg = config.get('scheduler_params', {})
             self.scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
                 optimizer, 
                 T_0=scheduler_cfg.get('T_0', 50),
