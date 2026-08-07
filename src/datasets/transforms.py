@@ -62,10 +62,10 @@ def get_validation_transforms(patch_size=256):
 def get_degradation_transforms():
     """Returns A.Compose simulating SEM degradation."""
     return A.Compose([
-        A.GaussNoise(var_limit=(0.001, 0.01), mean=0, p=0.5),
+        A.GaussNoise(p=0.5),
         A.GaussianBlur(blur_limit=(3, 7), p=0.5),
         A.MotionBlur(blur_limit=5, p=0.3),
-        A.ImageCompression(quality_lower=60, quality_upper=100, p=0.3),
+        A.ImageCompression(p=0.3),
         PoissonNoiseTransform(scale_range=(10.0, 50.0), p=0.5),
         SpeckleNoiseTransform(std=(0.1, 0.3), p=0.6)
     ])

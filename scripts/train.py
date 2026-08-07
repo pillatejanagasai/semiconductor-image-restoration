@@ -66,17 +66,17 @@ def main(cfg: DictConfig):
     
     train_loader = DataLoader(
         train_dataset,
-        batch_size=cfg.training.batch_size,
+        batch_size=cfg.dataset.batch_size,
         shuffle=True,
-        num_workers=cfg.training.num_workers,
+        num_workers=cfg.dataset.num_workers,
         pin_memory=True
     )
     
     val_loader = DataLoader(
         val_dataset,
-        batch_size=cfg.training.batch_size,
+        batch_size=cfg.dataset.batch_size,
         shuffle=False,
-        num_workers=cfg.training.num_workers,
+        num_workers=cfg.dataset.num_workers,
         pin_memory=True
     )
     
