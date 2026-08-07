@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Ensure the root project directory is in the PYTHONPATH so we can import 'src'
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import torch
@@ -5,8 +11,6 @@ from torch.utils.data import DataLoader
 import logging
 import random
 import numpy as np
-import os
-
 from src.datasets import SEMDataset
 from src.datasets.transforms import get_training_transforms, get_validation_transforms, get_degradation_transforms
 from src.models import MultiTaskRestorationNet
