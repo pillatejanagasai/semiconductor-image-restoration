@@ -61,7 +61,7 @@ env.bak/
 venv.bak/
 
 # Project specific
-dataset/
+/dataset/
 outputs/
 weights/
 logs/
