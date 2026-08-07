@@ -31,7 +31,7 @@ class MultiTaskRestorationNet(nn.Module):
             
         # Feature Fusion
         # Fuse outputs from all task decoders. Each outputs `out_channels`
-        self.feature_fusion = FeatureFusion([out_channels] * num_tasks, out_channels)
+        self.feature_fusion = FeatureFusion([out_channels] * len(task_names), out_channels)
         
         # Defect Preservation
         if use_defect_preservation:
@@ -41,7 +41,7 @@ class MultiTaskRestorationNet(nn.Module):
         # Final Reconstruction
         self.final_reconstruction = nn.Sequential(
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
-            nn.Tanh() # Assuming output range [-1, 1] or adjust accordingly
+            nn.Sigmoid() # Assuming output range [0, 1]
         )
         
     def forward(self, x):

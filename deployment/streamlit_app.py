@@ -73,7 +73,7 @@ def main():
             with torch.no_grad():
                 output_tensor = model(input_tensor)
                 
-            restored_img = postprocess_image(output_tensor)
+            restored_img = postprocess_image(output_tensor['output'] if isinstance(output_tensor, dict) else output_tensor)
             end_time = time.time()
             
         with col2:

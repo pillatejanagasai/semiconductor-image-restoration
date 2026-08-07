@@ -150,7 +150,7 @@ class Trainer:
                 for k, v in loss_dict.items():
                     losses_dict[k] = losses_dict.get(k, 0.0) + v.item()
                     
-                pred_img = outputs['restored'] if isinstance(outputs, dict) else outputs
+                pred_img = outputs['output'] if isinstance(outputs, dict) else outputs
                 
                 psnr = self._compute_psnr(pred_img, clean)
                 ssim = self._compute_ssim_metric(pred_img, clean)

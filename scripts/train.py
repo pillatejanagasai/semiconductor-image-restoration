@@ -30,7 +30,7 @@ def main(cfg: DictConfig):
     logger.info("Configuration:")
     logger.info(OmegaConf.to_yaml(cfg))
     
-    set_seed(cfg.get('seed', 42))
+    set_seed(cfg.project.seed)
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     logger.info(f"Using device: {device}")
@@ -76,7 +76,7 @@ def main(cfg: DictConfig):
     )
     
     criterion = CombinedLoss(
-        weights=cfg.loss.weights
+        weights=cfg.training.loss_weights
     )
     
     optimizer = torch.optim.AdamW(
@@ -86,15 +86,15 @@ def main(cfg: DictConfig):
     )
     
     trainer_config = {
-        'use_amp': cfg.training.use_amp,
+        'use_amp': cfg.training.mixed_precision,
         'scheduler': cfg.training.scheduler,
-        'log_dir': cfg.training.log_dir,
-        'checkpoint_dir': cfg.training.checkpoint_dir,
-        'save_every_n': cfg.training.save_every_n,
-        'patience': cfg.training.patience,
+        'log_dir': cfg.training.logging.log_dir,
+        'checkpoint_dir': cfg.training.checkpoint.save_dir,
+        'save_every_n': cfg.training.checkpoint.save_every_n_epochs,
+        'patience': cfg.training.early_stopping.patience,
         'epochs': cfg.training.epochs,
-        'max_grad_norm': cfg.training.max_grad_norm,
-        'log_every_n_steps': cfg.training.log_every_n_steps
+        'max_grad_norm': cfg.training.gradient_clip_max_norm,
+        'log_every_n_steps': cfg.training.logging.log_every_n_steps
     }
     
     trainer = Trainer(

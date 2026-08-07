@@ -42,8 +42,8 @@ graph TD
 ├── configs/           # Configuration files
 ├── dataset/           # Data directories
 ├── docs/              # Documentation
+├── deployment/        # FastAPI and Streamlit apps
 ├── src/               # Source code
-│   ├── api/           # FastAPI and Streamlit apps
 │   ├── datasets/      # Data loading and augmentation
 │   ├── losses/        # Custom loss functions
 │   ├── metrics/       # Evaluation metrics
@@ -61,7 +61,7 @@ graph TD
 
 ### Installation
 ```bash
-git clone https://github.com/user/semiconductor-image-restoration.clip
+git clone https://github.com/pillatejanagasai/semiconductor-image-restoration.git
 cd semiconductor-image-restoration
 pip install -r requirements.txt
 ```

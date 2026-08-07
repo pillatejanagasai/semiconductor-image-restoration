@@ -25,10 +25,11 @@ class ChannelAttention(nn.Module):
     def __init__(self, channels, reduction=16):
         super().__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        reduced_channels = max(1, channels // reduction)
         self.fc = nn.Sequential(
-            nn.Linear(channels, channels // reduction, bias=False),
+            nn.Linear(channels, reduced_channels, bias=False),
             nn.ReLU(inplace=True),
-            nn.Linear(channels // reduction, channels, bias=False),
+            nn.Linear(reduced_channels, channels, bias=False),
             nn.Sigmoid()
         )
         

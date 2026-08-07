@@ -19,26 +19,27 @@ class CombinedLoss(nn.Module):
         else:
             self.weights = weights
             
-        self.losses = nn.ModuleDict({
-            'l1': L1Loss() if self.weights.get('l1', 0) > 0 else None,
-            'ssim': SSIMLoss() if self.weights.get('ssim', 0) > 0 else None,
-            'perceptual': PerceptualLoss() if self.weights.get('perceptual', 0) > 0 else None,
-            'edge': EdgeLoss() if self.weights.get('edge', 0) > 0 else None,
-            'frequency': FrequencyLoss() if self.weights.get('frequency', 0) > 0 else None,
-            'gradient': GradientLoss() if self.weights.get('gradient', 0) > 0 else None
-        })
+        losses = {}
+        if self.weights.get('l1', 0) > 0: losses['l1'] = L1Loss()
+        if self.weights.get('ssim', 0) > 0: losses['ssim'] = SSIMLoss()
+        if self.weights.get('perceptual', 0) > 0: losses['perceptual'] = PerceptualLoss()
+        if self.weights.get('edge', 0) > 0: losses['edge'] = EdgeLoss()
+        if self.weights.get('frequency', 0) > 0: losses['frequency'] = FrequencyLoss()
+        if self.weights.get('gradient', 0) > 0: losses['gradient'] = GradientLoss()
         
-    def forward(self, pred, target, return_components=False):
+        self.losses = nn.ModuleDict(losses)
+        
+    def forward(self, pred, target):
+        if isinstance(pred, dict):
+            pred = pred.get('output', pred)
+            
         total_loss = 0.0
         components = {}
         
         for name, loss_fn in self.losses.items():
-            if loss_fn is not None and self.weights.get(name, 0) > 0:
-                loss_val = loss_fn(pred, target)
-                weighted_loss = self.weights[name] * loss_val
-                total_loss += weighted_loss
-                components[name] = weighted_loss.item()
+            loss_val = loss_fn(pred, target)
+            weighted_loss = self.weights[name] * loss_val
+            total_loss += weighted_loss
+            components[name] = weighted_loss.item()
                 
-        if return_components:
-            return total_loss, components
-        return total_loss
+        return total_loss, components

@@ -120,7 +120,8 @@ class InferenceEngine:
             return ort_outs[0]
         else:
             with torch.no_grad():
-                return self.model(x)
+                out = self.model(x)
+                return out['output'] if isinstance(out, dict) else out
 
     def _tiled_inference(self, image_tensor):
         """Perform tiled inference for large images."""

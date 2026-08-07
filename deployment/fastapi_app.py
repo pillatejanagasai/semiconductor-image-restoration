@@ -82,7 +82,7 @@ async def restore_image(file: UploadFile = File(...), task: Optional[str] = Quer
         with torch.no_grad():
             output_tensor = model(input_tensor)
             
-        result_bytes = postprocess_image(output_tensor)
+        result_bytes = postprocess_image(output_tensor['output'] if isinstance(output_tensor, dict) else output_tensor)
         
         return StreamingResponse(io.BytesIO(result_bytes), media_type="image/png")
     except Exception as e:
@@ -104,7 +104,7 @@ async def batch_restore(files: List[UploadFile] = File(...)):
                 with torch.no_grad():
                     output_tensor = model(input_tensor)
                     
-                result_bytes = postprocess_image(output_tensor)
+                result_bytes = postprocess_image(output_tensor['output'] if isinstance(output_tensor, dict) else output_tensor)
                 zip_file.writestr(f"restored_{file.filename.split('.')[0]}.png", result_bytes)
                 
         zip_buffer.seek(0)
@@ -118,13 +118,27 @@ async def batch_restore(files: List[UploadFile] = File(...)):
 
 @app.post('/analyze')
 async def analyze_image(file: UploadFile = File(...)):
-    """Analyze image quality metrics (mockup since full IQA not detailed)."""
-    return JSONResponse(content={
-        "psnr_estimate": 28.5,
-        "ssim_estimate": 0.85,
-        "sharpness": 120.4,
-        "noise_level": 15.2
-    })
+    """Analyze image quality metrics using IQA."""
+    try:
+        from src.metrics.iqa import ImageQualityAssessor
+        import math
+        contents = await file.read()
+        img = Image.open(io.BytesIO(contents)).convert('L')
+        img_np = np.array(img)
+        assessor = ImageQualityAssessor()
+        metrics = assessor.assess(img_np)
+        
+        # Convert any 'inf' or NaN values to string for JSON serialization
+        clean_metrics = {}
+        for k, v in metrics.items():
+            if math.isinf(v) or math.isnan(v):
+                clean_metrics[k] = str(v)
+            else:
+                clean_metrics[k] = float(v)
+                
+        return JSONResponse(content=clean_metrics)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get('/metrics')
 async def model_metrics():
