@@ -1,0 +1,10 @@
+checkpoint_path: weights/best_model.pth
+input_dir: dataset/processed/test/degraded
+output_dir: outputs
+device: auto
+batch_size: 1
+use_onnx: false
+onnx_path: weights/model.onnx
+tile_size: 256
+tile_overlap: 32
+save_comparison: true

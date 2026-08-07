@@ -1,0 +1,32 @@
+epochs: 200
+learning_rate: 0.001
+optimizer: adamw
+weight_decay: 0.01
+scheduler: cosine_warm_restarts
+scheduler_params:
+  T_0: 10
+  T_mult: 2
+  eta_min: 0.000001
+mixed_precision: true
+gradient_clip_max_norm: 1.0
+early_stopping:
+  enabled: true
+  patience: 20
+  min_delta: 0.0001
+  monitor: val_loss
+checkpoint:
+  save_dir: weights
+  save_best: true
+  save_latest: true
+  save_every_n_epochs: 10
+logging:
+  log_dir: logs
+  log_every_n_steps: 10
+  log_images_every_n_epochs: 5
+loss_weights:
+  l1: 1.0
+  ssim: 0.5
+  perceptual: 0.1
+  edge: 0.3
+  frequency: 0.2
+  gradient: 0.2
