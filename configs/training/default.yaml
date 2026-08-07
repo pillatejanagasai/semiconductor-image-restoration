@@ -26,7 +26,7 @@ logging:
 loss_weights:
   l1: 1.0
   ssim: 0.5
-  perceptual: 0.1
+  lpips: 0.1
   edge: 0.3
   frequency: 0.2
   gradient: 0.2

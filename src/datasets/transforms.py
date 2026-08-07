@@ -19,6 +19,31 @@ class PoissonNoiseTransform(ImageOnlyTransform):
     def get_transform_init_args_names(self):
         return ("scale_range",)
 
+class SpeckleNoiseTransform(ImageOnlyTransform):
+    """Speckle noise is a multiplicative noise: I = J + J * N"""
+    def __init__(self, mean=0, std=(0.1, 0.4), always_apply=False, p=0.5):
+        super(SpeckleNoiseTransform, self).__init__(always_apply, p)
+        self.mean = mean
+        self.std = std
+        
+    def apply(self, img, **params):
+        import random
+        std = random.uniform(self.std[0], self.std[1])
+        noise = np.random.normal(self.mean, std, img.shape)
+        
+        if img.dtype == np.uint8:
+            noisy_img = img.astype(np.float32)
+            noisy_img = noisy_img + noisy_img * noise
+            noisy_img = np.clip(noisy_img, 0, 255).astype(np.uint8)
+        else:
+            noisy_img = img + img * noise
+            noisy_img = np.clip(noisy_img, 0.0, 1.0).astype(np.float32)
+        return noisy_img
+        
+    def get_transform_init_args_names(self):
+        return ("mean", "std")
+
+
 def get_training_transforms(patch_size=256):
     """Returns A.Compose with standard training augmentations."""
     return A.Compose([
@@ -41,7 +66,8 @@ def get_degradation_transforms():
         A.GaussianBlur(blur_limit=(3, 7), p=0.5),
         A.MotionBlur(blur_limit=5, p=0.3),
         A.ImageCompression(quality_lower=60, quality_upper=100, p=0.3),
-        PoissonNoiseTransform(scale_range=(10.0, 50.0), p=0.5)
+        PoissonNoiseTransform(scale_range=(10.0, 50.0), p=0.5),
+        SpeckleNoiseTransform(std=(0.1, 0.3), p=0.6)
     ])
 
 def get_normalization():

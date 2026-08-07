@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from .basic_losses import L1Loss, SSIMLoss, PerceptualLoss
-from .advanced_losses import EdgeLoss, FrequencyLoss, GradientLoss
+from .basic_losses import L1Loss, SSIMLoss
+from .advanced_losses import EdgeLoss, FrequencyLoss, GradientLoss, LPIPSLoss
 
 class CombinedLoss(nn.Module):
     """Weighted combination of all loss functions."""
@@ -22,7 +22,7 @@ class CombinedLoss(nn.Module):
         losses = {}
         if self.weights.get('l1', 0) > 0: losses['l1'] = L1Loss()
         if self.weights.get('ssim', 0) > 0: losses['ssim'] = SSIMLoss()
-        if self.weights.get('perceptual', 0) > 0: losses['perceptual'] = PerceptualLoss()
+        if self.weights.get('lpips', 0) > 0: losses['lpips'] = LPIPSLoss()
         if self.weights.get('edge', 0) > 0: losses['edge'] = EdgeLoss()
         if self.weights.get('frequency', 0) > 0: losses['frequency'] = FrequencyLoss()
         if self.weights.get('gradient', 0) > 0: losses['gradient'] = GradientLoss()

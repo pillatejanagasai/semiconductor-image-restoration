@@ -59,3 +59,24 @@ class GradientLoss(nn.Module):
         loss_y = self.l1_loss(pred_grad_y, target_grad_y)
         
         return loss_x + loss_y
+
+class LPIPSLoss(nn.Module):
+    """Learned Perceptual Image Patch Similarity (LPIPS) loss."""
+    def __init__(self, net='alex'):
+        super().__init__()
+        import lpips
+        self.loss_fn = lpips.LPIPS(net=net)
+        
+    def forward(self, pred, target):
+        # LPIPS expects inputs in range [-1, 1]. Assuming pred and target are [0, 1]
+        pred_scaled = pred * 2.0 - 1.0
+        target_scaled = target * 2.0 - 1.0
+        
+        # Handle single channel by repeating
+        if pred_scaled.size(1) == 1:
+            pred_scaled = pred_scaled.repeat(1, 3, 1, 1)
+        if target_scaled.size(1) == 1:
+            target_scaled = target_scaled.repeat(1, 3, 1, 1)
+            
+        return self.loss_fn(pred_scaled, target_scaled).mean()
+
