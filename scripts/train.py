@@ -39,22 +39,29 @@ def main(cfg: DictConfig):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     logger.info(f"Using device: {device}")
     
-    train_transforms = get_training_transforms(cfg.dataset.img_size)
-    val_transforms = get_validation_transforms(cfg.dataset.img_size)
-    deg_transforms = get_degradation_transforms(cfg.dataset.degradation)
+    train_transforms = get_training_transforms(cfg.dataset.patch_size)
+    val_transforms = get_validation_transforms(cfg.dataset.patch_size)
+    deg_transforms = get_degradation_transforms()
+    
+    # Use synthetic data if available, otherwise raw
+    data_path = "dataset/synthetic" if os.path.exists("dataset/synthetic/clean") else cfg.dataset.data_dir
     
     train_dataset = SEMDataset(
-        data_dir=cfg.dataset.train_dir,
+        root_dir=data_path,
+        split='',  # Since synthetic generator doesn't create train/val splits yet
+        paired_mode=True, # Synthetic generator creates paired data
         transform=train_transforms,
         degradation_transform=deg_transforms,
-        is_train=True
+        patch_size=cfg.dataset.patch_size
     )
     
     val_dataset = SEMDataset(
-        data_dir=cfg.dataset.val_dir,
+        root_dir=data_path,
+        split='',
+        paired_mode=True,
         transform=val_transforms,
         degradation_transform=deg_transforms,
-        is_train=False
+        patch_size=cfg.dataset.patch_size
     )
     
     train_loader = DataLoader(
