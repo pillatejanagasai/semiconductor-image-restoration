@@ -145,6 +145,10 @@ class SEMDataset(Dataset):
             degraded_path = self.degraded_images[idx]
             degraded_img = self._load_image(degraded_path)
             
+            # Ensure degraded image matches clean image dimensions for spatial transforms and network forward pass
+            if degraded_img.shape[:2] != clean_img.shape[:2]:
+                degraded_img = cv2.resize(degraded_img, (clean_img.shape[1], clean_img.shape[0]), interpolation=cv2.INTER_CUBIC)
+                
             if self.patch_size > 0:
                 clean_img, degraded_img = self._random_crop([clean_img, degraded_img], self.patch_size)
         else:
