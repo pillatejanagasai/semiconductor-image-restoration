@@ -1,21 +1,20 @@
 # 🔬 AI-Based Restoration of Degraded Semiconductor Images
-**KLA AI Hackathon 2026 — Challenge Problem Statement Solution**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.1+](https://img.shields.io/badge/pytorch-2.1+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> A production-ready, highly-optimized AI pipeline engineered specifically to solve the KLA AI Hackathon's problem statement. 
+> An enterprise-grade, highly-optimized AI pipeline engineered for the rapid restoration of degraded semiconductor manufacturing images (SEM, optical). 
 
-## 🏆 Hackathon Alignment & Key Features
+## ✨ Key Features & Capabilities
 
-This project was built from the ground up to perfectly align with the strict evaluation criteria and hidden constraints provided in the KLA AI Hackathon brief.
+This project is built from the ground up to handle the extreme demands of industrial semiconductor inspection, focusing on computational speed, out-of-distribution robustness, and nanometer-scale feature preservation.
 
-- ⚡ **NVIDIA H100 Optimized (Slide 15):** The submission pipeline (`submit_eval.py`) abandons slow, sequential I/O loops. It utilizes a PyTorch `DataLoader` with parallel workers, batched GPU transfers, and **FP16 Mixed Precision via Tensor Cores**, allowing it to process thousands of images in milliseconds.
-- 🎯 **Direct LPIPS Optimization (Slide 14 & 18):** Instead of relying on generic MSE or VGG losses, our custom `CombinedLoss` directly performs gradient descent on the exact **Learned Perceptual Image Patch Similarity (LPIPS)** metric used by the judges.
-- 🦠 **Speckle Noise Mathematics (Slide 9 & 10):** The brief specifically notes that degraded images suffer from *Speckle noise* that exceeds ground-truth ranges. We built a mathematically accurate, multiplicative `SpeckleNoiseTransform` into our Albumentations pipeline to ensure extreme robustness.
-- ♾️ **Procedural Synthetic Generator (Slide 12 & 20):** To conquer the hidden "Out-of-Distribution" test set, we built a standalone generator (`generate_synthetic_data.py`) that uses pure geometry to draw infinite fake memory grids, logic traces, and *Dendrites* (perfectly matching Figure 2). This prevents the model from hallucinating on unseen distributions.
-- 🔍 **Defect Preservation Module:** Our custom architecture utilizes an attention mechanism designed *specifically* for semiconductor inspection. It prevents the denoising algorithm from accidentally erasing critical sub-nanometer manufacturing defects.
+- ⚡ **High-Throughput H100 Optimization:** The inference pipeline (`submit_eval.py`) abandons slow, sequential I/O loops. It utilizes PyTorch `DataLoader` with parallel workers, batched GPU transfers, and **FP16 Mixed Precision via Tensor Cores**, allowing it to process thousands of high-resolution images in milliseconds on modern NVIDIA architectures.
+- 🎯 **Perceptual Metric Optimization:** Instead of relying on generic MSE or VGG losses, our custom `CombinedLoss` directly performs gradient descent on the **Learned Perceptual Image Patch Similarity (LPIPS)** metric, combined with SSIM and L1, ensuring the restoration matches human perceptual quality.
+- 🦠 **Multiplicative Noise Robustness:** Industrial imaging often suffers from *Speckle noise* that exceeds ground-truth ranges. We built a mathematically accurate, multiplicative `SpeckleNoiseTransform` into our augmentation pipeline to ensure the model learns true physical degradation rather than artificial additive noise.
+- ♾️ **Procedural Synthetic Generation:** To conquer out-of-distribution physical structures, we built a standalone procedural generator (`generate_synthetic_data.py`). It uses pure geometry to draw infinite datasets of memory grids, logic traces, and radial dendrites. This prevents the model from hallucinating on unseen topologies.
+- 🔍 **Defect Preservation Module:** Our custom architecture utilizes an attention mechanism designed *specifically* for inspection. It prevents the denoising algorithm from accidentally erasing or smoothing over critical sub-nanometer manufacturing defects.
 
 ## 🏗️ Architecture
 
@@ -44,7 +43,7 @@ graph TD
 ├── deployment/        # Production Apps (FastAPI server & Streamlit Web UI)
 ├── scripts/           # Core execution scripts
 │   ├── train.py       # Distributed training loop
-│   ├── submit_eval.py # The official, H100-optimized Hackathon evaluation script
+│   ├── submit_eval.py # High-throughput batched inference script
 │   └── generate_synthetic_data.py # Procedural infinite dataset generator
 ├── src/               # Source code
 │   ├── datasets/      # Custom DataLoaders and Transforms
@@ -63,8 +62,8 @@ cd semiconductor-image-restoration
 pip install -r requirements.txt
 ```
 
-### 2. Hackathon Evaluation (H100 Optimized)
-To strictly evaluate the model on the hidden test set as required by the submission guidelines (Takes exactly 2 positional arguments):
+### 2. High-Speed Inference Evaluation
+To evaluate the model on a test set using the H100-optimized script:
 ```bash
 python scripts/submit_eval.py <path_to_test_images> <path_to_save_outputs>
 ```
