@@ -109,12 +109,12 @@ class Trainer:
             
             total_loss += loss.item()
             for k, v in loss_dict.items():
-                losses_dict[k] = losses_dict.get(k, 0.0) + v.item()
+                losses_dict[k] = losses_dict.get(k, 0.0) + (v.item() if hasattr(v, 'item') else v)
                 
             if self.global_step % self.config.get('log_every_n_steps', 10) == 0:
                 self.writer.add_scalar('Train/Loss', loss.item(), self.global_step)
                 for k, v in loss_dict.items():
-                    self.writer.add_scalar(f'Train/{k}', v.item(), self.global_step)
+                    self.writer.add_scalar(f'Train/{k}', (v.item() if hasattr(v, 'item') else v), self.global_step)
                 self.writer.add_scalar('Train/LR', self.optimizer.param_groups[0]['lr'], self.global_step)
                 
             self.global_step += 1
@@ -148,7 +148,7 @@ class Trainer:
                 
                 total_loss += loss.item()
                 for k, v in loss_dict.items():
-                    losses_dict[k] = losses_dict.get(k, 0.0) + v.item()
+                    losses_dict[k] = losses_dict.get(k, 0.0) + (v.item() if hasattr(v, 'item') else v)
                     
                 pred_img = outputs['output'] if isinstance(outputs, dict) else outputs
                 
