@@ -79,7 +79,10 @@ class Trainer:
         total_loss = 0.0
         losses_dict = {}
         
-        for batch_idx, batch in enumerate(self.train_loader):
+        from tqdm import tqdm
+        
+        pbar = tqdm(self.train_loader, desc=f"Epoch {epoch} [Train]", leave=False)
+        for batch_idx, batch in enumerate(pbar):
             degraded = batch['degraded'].to(self.device)
             clean = batch['clean'].to(self.device)
             
@@ -117,6 +120,7 @@ class Trainer:
                     self.writer.add_scalar(f'Train/{k}', (v.item() if hasattr(v, 'item') else v), self.global_step)
                 self.writer.add_scalar('Train/LR', self.optimizer.param_groups[0]['lr'], self.global_step)
                 
+            pbar.set_postfix({'loss': f"{loss.item():.4f}"})
             self.global_step += 1
             
         num_batches = len(self.train_loader)
@@ -133,8 +137,11 @@ class Trainer:
         total_psnr = 0.0
         total_ssim = 0.0
         
+        from tqdm import tqdm
+        
         with torch.no_grad():
-            for batch_idx, batch in enumerate(self.val_loader):
+            pbar = tqdm(self.val_loader, desc=f"Epoch {epoch} [Val]", leave=False)
+            for batch_idx, batch in enumerate(pbar):
                 degraded = batch['degraded'].to(self.device)
                 clean = batch['clean'].to(self.device)
                 
