@@ -93,7 +93,7 @@ def main(cfg: DictConfig):
     
     criterion = CombinedLoss(
         weights=cfg.training.loss_weights
-    )
+    ).to(device)
     
     optimizer = torch.optim.AdamW(
         model.parameters(),
