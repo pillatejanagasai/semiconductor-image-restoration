@@ -59,20 +59,32 @@ class ModelCheckpoint:
             is_best = True
 
         if is_best and self.save_best:
-            self._save(os.path.join(self.save_dir, 'best_model.pt'), epoch, model, optimizer, scheduler, scaler, extra)
+            # Only save model weights for best model to save disk space
+            self._save(os.path.join(self.save_dir, 'best_model.pt'), epoch, model, extra=extra)
 
         if self.save_latest:
+            # Save full training state for latest model so training can be resumed
             self._save(os.path.join(self.save_dir, 'latest_model.pt'), epoch, model, optimizer, scheduler, scaler, extra)
 
-        if epoch % self.save_every_n == 0:
-            self._save(os.path.join(self.save_dir, f'model_epoch_{epoch}.pt'), epoch, model, optimizer, scheduler, scaler, extra)
+        if self.save_every_n > 0 and epoch % self.save_every_n == 0:
+            # Delete previous epoch checkpoint to save disk space
+            prev_epoch = epoch - self.save_every_n
+            prev_path = os.path.join(self.save_dir, f'model_epoch_{prev_epoch}.pt')
+            if os.path.exists(prev_path):
+                try:
+                    os.remove(prev_path)
+                except OSError:
+                    pass
+            # Only save model weights for periodic checkpoints
+            self._save(os.path.join(self.save_dir, f'model_epoch_{epoch}.pt'), epoch, model, extra=extra)
 
-    def _save(self, filepath, epoch, model, optimizer, scheduler, scaler, extra):
+    def _save(self, filepath, epoch, model, optimizer=None, scheduler=None, scaler=None, extra=None):
         state = {
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
         }
+        if optimizer is not None:
+            state['optimizer_state_dict'] = optimizer.state_dict()
         if scheduler is not None:
             state['scheduler_state_dict'] = scheduler.state_dict()
         if scaler is not None:
